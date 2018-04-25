@@ -1,6 +1,4 @@
-<script type="text/javascript"
-    src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
 
 # Feature Importance vs. Permutation Importance
 
@@ -19,18 +17,6 @@ As a part of Lead Scoring project at Spreedly, I used feature importance of Rand
 
 $$
 n
-$$
-
-, and a large feature space,
-
-$$
-p^2
-$$
-
-and
-
-$$
-R^2
 $$
 
 and $p^2$ and $\kappa$. $$xxx$$
