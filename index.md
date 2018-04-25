@@ -10,6 +10,12 @@ MathJax.Hub.Config({
 
 As a part of Lead Scoring project at Spreedly, I used feature importance of Random Forests (RFs) to determine the important features that lead trial sign-ups to conversion. However, due to the lack of robustness and the fact that the results did not match the intuition from the domain knowledge, I decided to dig deeper into the problem where I learned about the extensive research on the RFs' feature importance. This note, that I try to keep short, is a summary of the problem and a couple of solutions discussed in literature. Let's get started!
 
+References:
+* [1]: [Beware Default Random Forest Importances](http://parrt.cs.usfca.edu/doc/rf-importance/index.html)
+* [2]: [Permutation importance: a corrected feature importance measure](https://academic.oup.com/bioinformatics/article/26/10/1340/193348)
+* [3]: [Bias in random forest variable importance measures: Illustrations, sources and a solution](https://link.springer.com/article/10.1186%2F1471-2105-8-25)
+
+
 ### The Problem
 
 #### Random Forests is popular
@@ -116,11 +122,6 @@ for col in X_valid.columns:
 
 * [2] We propose to employ an alternative implementation of random forests, that provides unbiased variable selection in the individual classification trees. When this method is applied using subsampling without replacement, the resulting variable importance measures can be used reliably for variable selection even in situations where the potential predictor variables vary in their scale of measurement or their number of categories.
 
-
-References:
-* [1]: [Beware Default Random Forest Importances](http://parrt.cs.usfca.edu/doc/rf-importance/index.html).
-* [2]: [Permutation importance: a corrected feature importance measure](https://academic.oup.com/bioinformatics/article/26/10/1340/193348)
-* [3]: [Bias in random forest variable importance measures: Illustrations, sources and a solution](https://link.springer.com/article/10.1186%2F1471-2105-8-25).
 
 #### 5. Repeated Permutation
 * [3] we introduce a heuristic for normalizing feature importance measures that can correct the feature importance bias. The method is based on repeated permutations of the outcome vector for estimating the distribution of measured importance for each variable in a non-informative setting. The P-value of the observed importance provides a corrected measure of feature importance. We apply our method to simulated data and demonstrate that (i) non-informative predictors do not receive significant P-values, (ii) informative variables can successfully be recovered among non-informative variables and (iii) P-values computed with permutation importance (PIMP) are very helpful for deciding the significance of variables, and therefore improve model interpretability.
