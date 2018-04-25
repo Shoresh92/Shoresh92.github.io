@@ -24,7 +24,7 @@ $$
 n
 $$
 
-and $p^2$ and $\kappa$. $$xxx$$
+and $p^2$ and $\kappa$. $xxx$
 
 #### RFs & Feature Importance
 * A naive variable importance measure is to merely count the number of times each variable is selected by all individual trees in the ensemble.
