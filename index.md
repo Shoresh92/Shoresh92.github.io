@@ -10,7 +10,7 @@ MathJax.Hub.Config({
 
 As a part of Lead Scoring project at Spreedly, I used feature importance of Random Forest (RF) to determine the important features that lead trial sign-ups to conversion. However, due to the lack of robustness and the fact that the results did not match the intuition from the domain knowledge, I decided to dig deeper into the problem where I learned about the extensive research on the RF' feature importance. This note, that I try to keep short, is a summary of the problem and a couple of solutions discussed in literature.
 
-Please note this is not an original writing as most of this post is a summary of the feature importance topic discussed in the three references below:
+Please note this post is a summary of the feature importance topic discussed in the three references below for future quick references.
 * [Beware Default Random Forest Importances](http://parrt.cs.usfca.edu/doc/rf-importance/index.html)
 * [Permutation importance: a corrected feature importance measure](https://academic.oup.com/bioinformatics/article/26/10/1340/193348)
 * [Bias in random forest variable importance measures: Illustrations, sources and a solution](https://link.springer.com/article/10.1186%2F1471-2105-8-25)
@@ -60,7 +60,7 @@ Please note this is not an original writing as most of this post is a summary of
 * The apparent association between the variables that is induced by bootstrap sampling, affects both feature and permutation importance measures: The selection frequency is again directly affected, and the permutation importance is affected because variables with many categories are selected more often and gain positions closer to the root node in the individual trees.
 
 **3. Collinearity**
-* Why collinearity is important? Because the importance is shared between the two collinear features: it's safe to conclude that permutation importance (and mean-decrease-in-impurity importance) computed on random forest models spreads importance across collinear variables. The amount of sharing appears to be a function of how much noise there is in between the two.
+* Why collinearity is important? Because the importance is shared between the two collinear features: Permutation Importance (and mean-decrease-in-impurity importance) spreads importance across collinear variables. The amount of sharing appears to be a function of how much noise there is in between the two.
 
 ### Solution
 #### 1. cForest
@@ -68,64 +68,43 @@ Please note this is not an original writing as most of this post is a summary of
 
 * The variable importance measure available in cForest, when used together with sampling without replacement, reliably reflects the true importance of potential predictor variables in a scenario where the potential predictor variables vary in their scale of measurement or number of categories.
 
-* Why feature selection based on conditional trees is not biased? Conditional inference trees, that are used to construct the classification trees in cForest, are unbiased in variable selection. Here, the variable selection is conducted by minimizing the $p$ value of a conditional inference independence test, comparable e.g. to the $\chi^2$ test, that incorporates the number of categories of each variable in the degrees of freedom.
+* Why feature selection based on conditional trees is not biased? Here, the variable selection is conducted by minimizing the $p$ value of a conditional inference independence test that incorporates the number of categories of each variable in the degrees of freedom.
 
 #### 2. Permutation Importance
-* Permutation is like randomizing a column and random column should have zero or no significance in predicting the output. Comparing the prediction accuracy of the actual data with the one from the dataset where a column values are shuffled can indicate the the significance of that particular column. If the difference is small, we conclude that the feature has no significance. If the significance is significant, we conclude otherwise.
+* Permutation is like randomizing a column and random column should have no significance in predicting the output. Comparing the prediction accuracy of the actual data with the one from the dataset where a column values are shuffled can indicate the the significance of that particular column. If the difference is small, we conclude that the feature has no significance. If the significance is significant, we conclude otherwise.
 
-**Pros**
-* It is broadly-applicable because it doesn't rely on internal model parameters, such as linear regression coefficients
+* Pros:
+  * It is broadly-applicable because it doesn't rely on internal model parameters, such as linear regression coefficients
+  * It it is recommended for any model including regression models since interpreting regression coefficients requires great care and expertise; landmines include not normalizing input data, properly interpreting coefficients when using Lasso or Ridge regularization, and avoiding highly-correlated variables.
+  * Permutation importance does not require the retraining of the underlying model in order to measure the effect of shuffling variables on overall model accuracy.
 
-* On the other hand. it is recommended for any model including regression models since interpreting regression coefficients "requires great care and expertise; landmines include not normalizing input data, properly interpreting coefficients when using Lasso or Ridge regularization, and avoiding highly-correlated variables"
+* Cons: Permutation Importance over-estimates the importance of correlated predictor variables.
 
-* Permutation importance does not require the retraining of the underlying model in order to measure the effect of shuffling variables on overall model accuracy. Because training the model can be extremely expensive and even take days, this is a big performance win. The risk is a potential bias towards correlated predictive variables.
+* Generalization: Model-neutral permutation importance
+  * Use a generic scoring function instead of Out-Of-Bag approach that works for RF and a couple of other ensemble methods.
 
-```
-def permutation_importances(rf, X_train, y_train, metric):
-    baseline = metric(rf, X_train, y_train)
-    imp = []
-    for col in X_train.columns:
-        save = X_train[col].copy()
-        X_train[col] = np.random.permutation(X_train[col])
-        m = metric(rf, X_train, y_train)
-        X_train[col] = save
-        imp.append(baseline - m)
-    return np.array(imp)
-```
-
- **Cons**
-* PIMP over-estimates the importance of correlated predictor variables. It's unclear just how big the bias towards correlated predictor variables is.
-
-#### 3. Model-neutral permutation importance
-* Use a generic scoring function instead of Out-Of-Bag approach that works for RF and a couple of other ensemble methods.
-
-```
-baseline = model.score(X_valid, y_valid)
-imp = []
-for col in X_valid.columns:
-    save = X_valid[col].copy()
-    X_valid[col] = np.random.permutation(X_valid[col])
-    m = model.score(X_valid, y_valid)
-    X_valid[col] = save
-    imp.append(baseline - m)
-```
-
-#### 4. Drop-column Importance
-
-* If we ignore the computation cost of retraining the model, we can get the most accurate feature importance using a brute force drop-column importance mechanism. The idea is to get a baseline performance score as with permutation importance but then drop a column entirely, retrain the model, and recompute the performance score.
+#### 3. Drop-column Importance
+* If we ignore the computation cost of retraining the model, we can get the most accurate feature importance using a brute force drop-column importance mechanism.
+* The idea is to get a baseline performance score as with permutation importance but then drop a column entirely, retrain the model, and recompute the performance score.
 * This strategy answers the question of how important a feature is to overall model performance even more directly than the permutation importance strategy.
-* Drop-column approach reminds me of **SelectKBest()** methos in scikit-learn. The latter, however, is more general since the goal is to find the $k$ best features for prediction rather than evaluating one feature's significance.
+* Drop-column approach reminds me of **SelectKBest()** methods in scikit-learn package. The latter, however, is more general since the goal is to find the $k$ best features for prediction rather than evaluating one feature's significance.
 
+#### 4. Repeated Permutation
+* The method is based on repeated permutations of the outcome vector for estimating the distribution of measured importance for each variable in a non-informative setting. The $p$-value of the observed importance provides a corrected measure of feature importance.
+* Non-informative predictors do not receive significant $p$-values so informative variables can successfully be recovered among non-informative variables.
 
-#### 5. Repeated Permutation
-* The method is based on repeated permutations of the outcome vector for estimating the distribution of measured importance for each variable in a non-informative setting. The P-value of the observed importance provides a corrected measure of feature importance.
-* Non-informative predictors do not receive significant P-values, informative variables can successfully be recovered among non-informative variables and p-values computed with permutation importance (PIMP) are very helpful for deciding the significance of variables, and therefore improve model interpretability.
+* The major drawback of this method is the requirement of time-consuming permutations of the response vector and subsequent computation of feature importance. Simulations showed that around 10 permutations provides improvements over a biased base method. For stability of the results any number from 50 to 100 permutations is recommended.
 
-* [3] The major drawback of this method is the requirement of time-consuming permutations of the response vector and subsequent computation of feature importance.
-* Simulations showed that around 10 permutations provides improvements over a biased base method. For stability of the results any number from 50 to 100 permutations is recommended.
 
 ### In Practice
+* This is the order of steps I take
+  * Drop-out importance is my first choice us if the feature space is small and the approach is computationally affordable.
+  * Permutation importance
+    * Make sure to identify collinear features and permute then altogether.
 
+* Python
+  * Library: [rfpimp](https://github.com/parrt/random-forest-importances/tree/master/src)
+  * Learn more about it [here](http://parrt.cs.usfca.edu/doc/rf-importance/index.html)
 
 ---
 # Bank Identification Number (BIN) Databases
