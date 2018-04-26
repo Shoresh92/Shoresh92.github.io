@@ -1,4 +1,5 @@
 theme: jekyll-theme-cayman
 title: Data Notes
 description: My short notes on topics in Data Science, Machine Learning and Statisitcal Analysis
-link: Connect with me on [LinkedIn](https://www.linkedin.com/in/sshafei/)
+# email address feedback gets sent to
+feedback_email: s.shafei@gmail.com
