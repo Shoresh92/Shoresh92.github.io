@@ -8,17 +8,17 @@ MathJax.Hub.Config({
 
 # Feature Importance vs. Permutation Importance
 
-As a part of Lead Scoring project at Spreedly, I used feature importance of random forest (RF) to determine the important features that lead trial sign-ups to conversion. However, due to the lack of robustness and the fact that the results did not match the intuition from the domain knowledge, I decided to dig deeper into the problem where I learned about the extensive research on the RF' feature importance. This note, that I try to keep short, is a summary of the problem and a couple of solutions discussed in literature. Let's get started!
+As a part of Lead Scoring project at Spreedly, I used feature importance of Random Forest (RF) to determine the important features that lead trial sign-ups to conversion. However, due to the lack of robustness and the fact that the results did not match the intuition from the domain knowledge, I decided to dig deeper into the problem where I learned about the extensive research on the RF' feature importance. This note, that I try to keep short, is a summary of the problem and a couple of solutions discussed in literature.
 
-This post is not an original writing but a summary of the three references below. The first two, however, were used more than the third one:
+Please note this is not an original writing as most of this post is a summary of the feature importance topic discussed in the three references below:
 * [Beware Default Random Forest Importances](http://parrt.cs.usfca.edu/doc/rf-importance/index.html)
 * [Permutation importance: a corrected feature importance measure](https://academic.oup.com/bioinformatics/article/26/10/1340/193348)
 * [Bias in random forest variable importance measures: Illustrations, sources and a solution](https://link.springer.com/article/10.1186%2F1471-2105-8-25)
 
 
-### The Problem
+### Problem
 
-#### random forest is popular
+#### Random Forest is popular
 * Built from ensemble of decision trees, they are interpretable!
 * They are high-performance algorithms.
 * They require minimum data preparation compared to algorithms such as logistic regression.
@@ -26,44 +26,43 @@ This post is not an original writing but a summary of the three references below
 * They can be used for evaluating feature importance.
 * They do well with datasets with small number of observations, $n$, and large feature space, $p$.
 
-#### Feature Importance in random forest
+#### Feature Importance in Random Forest
 * Three ways to measure feature importance via RF:
   * A naive variable importance measure: to merely count the number of times each variable is selected by all individual trees in the ensemble.
   * Gini Index: the improvement in the "Gini gain" splitting criterion.
   * Permutation Significance: the permutation accuracy importance measure.
 
 #### Feature Importance in RF Is Biased
-* RF variable importance measures are not reliable in situations where potential predictor variables vary in their scale of measurement or their number of categories.
-
-* Only continuous predictor variables or only variables with the same number of categories are considered in the sample, variable selection with random forest variable importance measures is not affected. However, in studies where continuous variables, are used in combination with categorical information from the neighboring nucleotides, or when categorical predictors vary in their number of categories present in the sample variable selection with random forest variable importance measures is unreliable and may even be misleading.
+* RF variable importance measures are not reliable in situations where
+  * predictor variables vary in their scale of measurement and/or
+  * predictor variables vary in their number of categories
 
 * If predictors are categorical, feature importance measures are biased in favor of variables taking more categories.  
-
-* In general, feature importances should only be trusted with a strong model. If your model does not generalize accurately, feature importances are worthless. If your model is weak, you will notice that the feature importances fluctuate dramatically from run to run.
-
-* Variable selection bias affects the variable importance measures in two ways: Firstly, the variable selection frequencies over all trees are directly affected by the variable selection bias in each individual tree. Secondly, the effect on the permutation importance is less obvious but just as severe.
 
 * Severe effect of selection bias on permutation importance: When permuting the variables to compute their permutation importance measure, the variables that appear in more trees and are situated closer to the root node can affect the prediction accuracy of a larger set of observations, while variables that appear in fewer trees and are situated closer to the bottom nodes affect only small subsets of observations. Thus, the range of possible changes in prediction accuracy in the random forest, i.e. the deviation of the variable importance measure, is higher for variables that are preferred by the individual trees due to variable selection bias.
 
 #### The Root of the Bias
-* The bias is due to the use of **bootstrap sampling** and **Gini split criterion** for training classification and regression trees. Also **collinearity** is important and I will discuss it after the former two.
+* The bias is due to the use of
+  * **bootstrap sampling**
+  * **Gini split criterion**
+* The bias can also be due to the
+  * **collinearity**
 
 **1. Gini Split Criterion**
-* In traditional classification tree algorithms, like CART, for each variable a split criterion like the "Gini index" is computed for all possible cutpoints within the range of that variable. The variable selected for the next split is the one that produced the highest criterion value overall, i.e. in its best cutpoint. Obviously variables with more potential cutpoints are more likely to produce a good criterion value by chance.
+* In traditional classification tree algorithms, for each variable a split criterion like the "Gini index" is computed for all possible cutpoints within the range of that variable. The variable selected for the next split is the one that produced the highest criterion value overall, i.e. in its best cutpoint. Obviously variables with more potential cutpoints are more likely to produce a good criterion value by chance.
 * Therefore, if we compare the highest criterion value of a variable with two categories, say, that provides only one cutpoint from which the criterion was computed, with a variable with four categories, that provides seven cutpoints from which the best criterion value is used, the latter is often preferred.
 * Because the number of cutpoints grows exponentially with the number of categories of unordered categorical predictors we find a preference for variables with more categories in CART-like classification trees.
 * Since the Gini importance measure in randomForest is directly derived from the Gini index split criterion used in the underlying individual classification trees, it carries forward the same bias.
-* The variable selection bias that occurs in every individual tree in the RF function also has a direct effect on the variable importance measures of this function. Predictor variables with more categories are artificially preferred in variable selection in each splitting decision. Thus, they are selected in more individual classification trees and tend to be situated closer to the root node in each tree.
 
 **2. Bootstrapping**
 * The bootstrap sampling artificially induces an association between the variables. This effect is always present when statistical inference, such as an association test, is carried out on bootstrap samples: Bootstrap hypothesis testing fails whenever the distribution of any statistic in the bootstrap sample, rather than the distribution of the statistic under the null hypothesis, is used for statistical inference. This issue directly affects variable selection in random forest, because the deviation from the null hypothesis is more pronounced for variables that have more categories. However, if subsamples are drawn without replacement the effect disappears.
 
-* The apparent association between the variables that is induced by bootstrap sampling, and that is more pronounced for predictor variables with many categories, affects both variable importance measures: The selection frequency is again directly affected, and the permutation importance is affected because variables with many categories are selected more often and gain positions closer to the root node in the individual trees.
+* The apparent association between the variables that is induced by bootstrap sampling, affects both feature and permutation importance measures: The selection frequency is again directly affected, and the permutation importance is affected because variables with many categories are selected more often and gain positions closer to the root node in the individual trees.
 
 **3. Collinearity**
 * Why collinearity is important? Because the importance is shared between the two collinear features: it's safe to conclude that permutation importance (and mean-decrease-in-impurity importance) computed on random forest models spreads importance across collinear variables. The amount of sharing appears to be a function of how much noise there is in between the two.
 
-### The Solution
+### Solution
 #### 1. cForest
 * cForest which is based on Conditional Inference Trees is, to the best of my knowledge, only available in $R$.
 
@@ -125,7 +124,7 @@ for col in X_valid.columns:
 * [3] The major drawback of this method is the requirement of time-consuming permutations of the response vector and subsequent computation of feature importance.
 * Simulations showed that around 10 permutations provides improvements over a biased base method. For stability of the results any number from 50 to 100 permutations is recommended.
 
-### Action
+### In Practice
 
 
 ---
