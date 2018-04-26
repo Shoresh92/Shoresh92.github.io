@@ -5,7 +5,7 @@ MathJax.Hub.Config({
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
 
-# On Feature Importance in Random Forest
+# 2. On Feature Importance in Random Forest
 As a part of the Lead Scoring project at Spreedly, I used feature importance of Random Forest (RF) to determine the important features that lead trial sign-ups to conversion. However, due to the lack of robustness and the fact that the results did not match the intuition from the domain knowledge, I decided to dig deeper into the problem where I learned about the extensive research on the RF' feature importance. This note, that I try to keep short, is a summary of the problem and a couple of solutions discussed in literature.
 
 Please note this post is a summary of the feature importance topic discussed in the three references below for future quick references.
@@ -106,7 +106,7 @@ Please note this post is a summary of the feature importance topic discussed in 
 
 
 ---
-# Bank Identification Number (BIN) Databases
+# 1. Bank Identification Number (BIN) Databases
 
 Based on the first 6 digits of a payment card, BIN (Bank Identification Number) database provides useful information about the card type (credit or debit), the card brand (Visa, MasterCard, etc.), the issuing bank (Chase, TD, Bank of America, etc.), the category (reward, classic, etc.), and the country where the card was issued.
 
