@@ -78,7 +78,8 @@ Please note this post is a summary of the feature importance topic discussed in 
   * It it is recommended for any model including regression models since interpreting regression coefficients requires great care and expertise; landmines include not normalizing input data, properly interpreting coefficients when using Lasso or Ridge regularization, and avoiding highly-correlated variables.
   * Permutation importance does not require the retraining of the underlying model in order to measure the effect of shuffling variables on overall model accuracy.
 
-* Cons: Permutation Importance over-estimates the importance of correlated predictor variables.
+* Cons:
+  * Permutation Importance over-estimates the importance of correlated predictor variables.
 
 * Generalization: Model-neutral permutation importance
   * Use a generic scoring function instead of Out-Of-Bag approach that works for RF and a couple of other ensemble methods.
