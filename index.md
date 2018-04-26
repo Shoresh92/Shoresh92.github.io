@@ -5,10 +5,8 @@ MathJax.Hub.Config({
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
 
-
-# Feature Importance vs. Permutation Importance
-
-As a part of Lead Scoring project at Spreedly, I used feature importance of Random Forest (RF) to determine the important features that lead trial sign-ups to conversion. However, due to the lack of robustness and the fact that the results did not match the intuition from the domain knowledge, I decided to dig deeper into the problem where I learned about the extensive research on the RF' feature importance. This note, that I try to keep short, is a summary of the problem and a couple of solutions discussed in literature.
+# On Feature Importance in Random Forest
+As a part of the Lead Scoring project at Spreedly, I used feature importance of Random Forest (RF) to determine the important features that lead trial sign-ups to conversion. However, due to the lack of robustness and the fact that the results did not match the intuition from the domain knowledge, I decided to dig deeper into the problem where I learned about the extensive research on the RF' feature importance. This note, that I try to keep short, is a summary of the problem and a couple of solutions discussed in literature.
 
 Please note this post is a summary of the feature importance topic discussed in the three references below for future quick references.
 * [Beware Default Random Forest Importances](http://parrt.cs.usfca.edu/doc/rf-importance/index.html)
@@ -17,7 +15,6 @@ Please note this post is a summary of the feature importance topic discussed in 
 
 
 ### Problem
-
 #### Random Forest is popular
 * Built from ensemble of decision trees, they are interpretable!
 * They are high-performance algorithms.
@@ -104,8 +101,9 @@ Please note this post is a summary of the feature importance topic discussed in 
     * Make sure to identify collinear features and permute then altogether.
 
 * Python
-  * Library: [rfpimp](https://github.com/parrt/random-forest-importances/tree/master/src)
-  * Learn more about it [here](http://parrt.cs.usfca.edu/doc/rf-importance/index.html)
+  * Library: [rfpimp](https://github.com/parrt/random-forest-importances/tree/master/src): `pip install rfpimp`
+  * Learn more about rfpimp [here](http://parrt.cs.usfca.edu/doc/rf-importance/index.html)!
+
 
 ---
 # Bank Identification Number (BIN) Databases
