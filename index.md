@@ -13,7 +13,6 @@ Please note this post is a summary of the feature importance topic discussed in 
 * [Permutation importance: a corrected feature importance measure](https://academic.oup.com/bioinformatics/article/26/10/1340/193348)
 * [Bias in random forest variable importance measures: Illustrations, sources and a solution](https://link.springer.com/article/10.1186%2F1471-2105-8-25)
 
-
 ### Problem
 #### Random Forest is popular
 * Built from ensemble of decision trees, they are interpretable!
@@ -96,15 +95,10 @@ Please note this post is a summary of the feature importance topic discussed in 
 
 ### In Practice
 * This is the order of steps I take
-  * Drop-out importance is my first choice us if the feature space is small and the approach is computationally affordable.
+  * Drop-out importance is my first choice if the feature space is small and the approach is computationally affordable.
   * Permutation importance
-    * Make sure to identify collinear features and permute then altogether.
-
-* Python
-  * Library: [rfpimp](https://github.com/parrt/random-forest-importances/tree/master/src): `pip install rfpimp`
-  * Learn more about rfpimp [here](http://parrt.cs.usfca.edu/doc/rf-importance/index.html)!
-
-
+    * Use [rfpimp](http://parrt.cs.usfca.edu/doc/rf-importance/index.html) library: A library of functions that can be used for drop-column and permutation importances.
+    * Make sure to identify collinear features. If using Permutation Importance, make sure to permute them altogether.
 ---
 # 1. Bank Identification Number (BIN) Databases
 
