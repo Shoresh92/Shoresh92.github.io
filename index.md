@@ -99,6 +99,10 @@ Please note this post is a summary of the feature importance topic discussed in 
   * Permutation importance
     * Use [rfpimp](http://parrt.cs.usfca.edu/doc/rf-importance/index.html) library: A library of functions that can be used for drop-column and permutation importances.
     * Make sure to identify collinear features. If using Permutation Importance, make sure to permute them altogether.
+    * Notable functions in `rfpimp`:
+      * Permutation Feature Importance using cross-validation: `cv_importances(model, X_train, y_train, k=3)`
+      * Permutation Feature Importance using a predefined metric: `permutation_importances(rf, X_train, y_train, metric)`
+      * Drop-column Feature Importance:`def dropcol_importances(rf, X_train, y_train)`
 ---
 # 1. Bank Identification Number (BIN) Databases
 
