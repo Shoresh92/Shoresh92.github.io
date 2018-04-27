@@ -101,7 +101,6 @@ Please note this post is a summary of the feature importance topic discussed in 
     * Make sure to identify collinear features. If using Permutation Importance, make sure to permute them altogether.
 * Notable functions in `rfpimp`:
   * Permutation Feature Importance using cross-validation:
-  
   `cv_importances(model, X_train, y_train, k=3)`
   * Permutation Feature Importance using a predefined metric:
 
