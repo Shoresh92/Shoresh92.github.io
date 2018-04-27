@@ -103,10 +103,8 @@ Please note this post is a summary of the feature importance topic discussed in 
   * Permutation Feature Importance using cross-validation:
   `cv_importances(model, X_train, y_train, k=3)`
   * Permutation Feature Importance using a predefined metric:
-
   `permutation_importances(rf, X_train, y_train, metric)`
   * Drop-column Feature Importance:
-
   `def dropcol_importances(rf, X_train, y_train)`
 ---
 # 1. Bank Identification Number (BIN) Databases
